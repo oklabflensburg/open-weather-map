@@ -30,7 +30,7 @@ conn.autocommit = True
 cursor = conn.cursor()
 
 
-with open('KL_Tageswerte_Beschreibung_Stationen.txt', 'r') as f:
+with open('./data/KL_Tageswerte_Beschreibung_Stationen.csv', 'r') as f:
     csvreader = csv.reader(f)
 
     next(csvreader)
