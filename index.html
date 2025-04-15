@@ -1,71 +1,773 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Open Weather Map - Deutschland</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet-src.js"></script>
-    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-    <script src="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Map Application</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link crossorigin="" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" rel="stylesheet">
-    <link href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" rel="stylesheet">
-    <link href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" rel="stylesheet">
-    <link href="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.css" rel="stylesheet">
-    <link href="main.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    zIndex: {
+                        '1000': '1000'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin=""/>
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin=""></script>
+            
+    <!-- Leaflet.markercluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    
+    <!-- Leaflet.markercluster JS -->
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 </head>
-<body class="">
-    <nav class="w-full bg-gray-700 p-2 fixed w-full z-40 top-0 left-0">
-        <div class="flex flex-wrap items-center justify-between mx-auto">
-            <a class="flex items-center bg-white rounded-lg py-1.5 px-3" href="#"><span class="self-center text-xl font-semibold whitespace-nowrap text-indigo-900">Open Weather Map <span class="self-bottom text-xl font-thin text-gray-800">2.0</span></span></a>
-            <div class="flex w-1/5 md:order-2">
-                <button aria-controls="navbar-search" aria-expanded="false" class="md:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded text-sm p-2.5 mr-1" data-collapse-toggle="navbar-search" type="button"><svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path clip-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" fill-rule="evenodd"></path></svg> <span class="sr-only">Search</span></button>
-                <div class="relative items-center flex w-full mx-2">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <svg aria-hidden="true" class="w-5 h-5 text-gray-500" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path clip-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" fill-rule="evenodd"></path></svg> <span class="sr-only">Search icon</span>
-                    </div><input class="block w-full p-2 pl-10 text-md text-gray-900 border border-gray-300 rounded bg-gray-50 focus-ring-0 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" id="search-navbar" placeholder="Search..." type="text">
-                </div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-0 focus:outline-none focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">Go</button> <button aria-controls="navbar-sticky" aria-expanded="false" class="inline-flex items-center p-2 text-sm text-gray-500 rounded md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200" data-collapse-toggle="navbar-sticky" type="button"><span class="sr-only">Open main menu</span> <svg aria-hidden="true" class="w-6 h-6" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path clip-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" fill-rule="evenodd"></path></svg></button>
+<body class="flex flex-col min-h-screen bg-gray-100">
+    <!-- Navigation Menu -->
+    <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-3">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold">Weather Map</h1>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="menu-toggle" class="focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Desktop Menu with Search -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <div class="flex space-x-4">
+                        <a href="#" class="hover:text-blue-200">Home</a>
+                        <a href="#" class="hover:text-blue-200">Forecast</a>
+                        <a href="#" class="hover:text-blue-200">Radar</a>
+                        <a href="#" class="hover:text-blue-200">About</a>
+                    </div>
+                    <!-- Desktop Search -->
+                    <div class="relative">
+                        <input type="text" placeholder="Search location..." 
+                              class="px-4 py-1 rounded-md text-gray-800 w-64 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    </div>
+                </div>
             </div>
-            <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1 z-50" id="navbar-sticky">
-                <ul class="flex flex-col py-3 px-6 mt-4 md:flex-row md:space-x-8 md:mt-0 md:font-medium">
-                    <li>
-                        <a aria-current="page" class="block py-2 pl-3 pr-4 text-white hover:text-orange-50 focus:text-orange-50 md:p-0" href="#">Projekt</a>
-                    </li>
-                    <li>
-                        <a class="block py-2 pl-3 pr-4 text-white hover:text-orange-50 focus:text-orange-50 md:p-0" target="_blank" href="https://github.com/oklabflensburg/open-weather-map/tree/main/data">Daten</a>
-                    </li>
-                    <li>
-                        <a class="block py-2 pl-3 pr-4 text-white hover:text-orange-50 focus:text-orange-50 md:p-0" target="_blank" href="https://github.com/oklabflensburg/open-weather-map/tree/main/data">Download</a>
-                    </li>
-                    <li>
-                        <a class="block py-2 pl-3 pr-4 text-white hover:text-orange-50 focus:text-orange-50 md:p-0" target="_blank" href="https://github.com/oklabflensburg/open-weather-map">GitHub</a>
-                    </li>
-                </ul>
+            
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <a href="#" class="block py-2 hover:text-blue-200">Home</a>
+                <a href="#" class="block py-2 hover:text-blue-200">Forecast</a>
+                <a href="#" class="block py-2 hover:text-blue-200">Radar</a>
+                <a href="#" class="block py-2 hover:text-blue-200">About</a>
             </div>
         </div>
     </nav>
-    <div class="sm:flex mt-12 sm:mt-16 overflow-hidden" id="wrapper">
-        <div class="w-full sm:w-8/12 md:w-7/12 lg:w-9/12 overflow-hidden" id="map"></div>
-        <div class="w-full sm:w-4/12 md:w-5/12 lg:w-3/12 sm:overflow-scroll bg-neutral-100" id="filter">
-            <div class="">
-                <div class="text-red-700 p-3">
-                    <h1 class="text-2xl md:text-3xl font-bold">Open Weather Map</h1>
-                    <h2 class="text-gray-700 text-md">Datenlizenz Deutschland - Version 2.0</h2>
-                </div>
-            </div>
-            <div class="py-2 px-3">
-                <h3 class="font-sans text-xl md:text-2xl mb-1 md:mb-3">Interaktive Karte</h3>
-                <p class="font-mono mb-4 md:mb-8">Interaktive Karte mit den Wetterdaten des Deutschen Wetterdienstes auf Basis der Stations Kennungen.</p>
-                <h3 class="font-sans text-xl md:text-2xl mb-1 md:mb-3">Datenquelle</h3>
-                <p class="font-mono mb-4 md:mb-8">Die Liste der Wetterstationen und deren Daten werden vom Deutschen Wetterdienst auf folgender Seite <a class="text-blue-600 hover:text-blue-500 focus:text-blue:500" href="https://opendata.dwd.de" target="_blank">https://opendata.dwd.de</a> zum Download angeboten. Für die Abfragen der einzelnen Datensätze werden die Endpunkte der API kann <a class="text-blue-600 hover:text-blue-500 focus:text-blue:500" href="https://dwd.api.bund.dev" target="_blank">https://dwd.api.bund.dev</a> aufgerufen werden.</p>
-                <h3 class="font-sans text-xl md:text-2xl mb-1 md:mb-3">Quellcode</h3>
-                <p class="font-mono"><a class="text-blue-600 hover:text-blue-500 focus:text-blue:500" href="https://github.com/oklabflesburg/open-weather-map" target="_blank">GitHub</a></p>
+    
+    <!-- Mobile Search Bar (hidden on desktop) -->
+    <div class="bg-blue-500 py-4 md:hidden">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col items-center justify-center">
+                <input type="text" placeholder="Enter city name..." 
+                      class="w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600">
             </div>
         </div>
     </div>
-    <script src="main.js"></script>
+    
+    <!-- Main Content with Map -->
+    <main class="flex-grow flex flex-col w-full" id="main-content">
+        <div class="w-full h-full flex-grow flex flex-col">
+            <div id="map" class="w-full h-full flex-grow"></div>
+        </div>
+    </main>
+    
+    <!-- Details Panel (Bottom Sheet / Sidebar) -->
+    <div id="details-panel" class="fixed bottom-0 left-0 right-0 bg-white shadow-lg z-1000 rounded-t-xl transform translate-y-full transition-transform duration-300 ease-out max-h-[70vh] overflow-y-auto md:w-[350px] md:right-auto md:top-[135px] md:bottom-[96px] md:max-h-[calc(100vh-231px)] md:rounded-none md:rounded-r-xl md:translate-x-[-100%] md:border-r md:border-t md:border-b md:border-gray-200">
+        <div id="drag-handle" class="w-10 h-[5px] bg-gray-300 rounded mx-auto my-[10px] cursor-pointer md:hidden"></div>
+        <div class="p-4">
+            <h2 id="marker-title" class="text-xl font-bold mb-2">Location Details</h2>
+            <div id="marker-content" class="text-gray-700">
+                Select a marker to view details.
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p>&copy; 2023 Weather Map Application</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="hover:text-blue-300">Terms</a>
+                    <a href="#" class="hover:text-blue-300">Privacy</a>
+                    <a href="#" class="hover:text-blue-300">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+        
+        // Initialize Leaflet map
+        const map = L.map('map', {
+            zoomControl: false
+        }).setView([54.5, 10], 9); // Centered more on Flensburg area
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Replace simple layer group with marker cluster group
+        const markersLayer = L.markerClusterGroup({
+            disableClusteringAtZoom: 12, // Don't cluster at high zoom levels
+            spiderfyOnMaxZoom: false,    // Don't spiderfy clusters on max zoom
+            chunkedLoading: true,        // Load markers in chunks for better performance
+            maxClusterRadius: 50,        // Maximum radius in pixels for clusters
+            iconCreateFunction: function(cluster) {
+                const count = cluster.getChildCount();
+                let size, className;
+                
+                // Size based on number of markers
+                if (count < 10) {
+                    size = 'small';
+                    className = 'bg-blue-500';
+                } else if (count < 100) {
+                    size = 'medium';
+                    className = 'bg-blue-600';
+                } else {
+                    size = 'large';
+                    className = 'bg-blue-700';
+                }
+                
+                // Create a custom cluster icon with Tailwind classes
+                return L.divIcon({
+                    html: '<div class="flex items-center justify-center rounded-full ' + className + ' text-white font-bold" style="width: 100%; height: 100%">' + count + '</div>',
+                    className: 'marker-cluster marker-cluster-' + size,
+                    iconSize: [40, 40]
+                });
+            }
+        }).addTo(map);
+        
+        // Track current selected marker
+        let currentSelectedMarker = null;
+        let selectedMarkerLatLng = null; // Store the selected marker coordinates
+        let isZoomingToMarker = false; // Flag to indicate if we're zooming to a marker
+        
+        // Create default and highlighted marker icons
+        const defaultIcon = L.icon({
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            shadowSize: [41, 41]
+        });
+        
+        const highlightedIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            shadowSize: [41, 41]
+        });
+        
+        // Function to search locations using Nominatim
+        async function searchLocation(query) {
+            if (!query || query.trim().length < 3) {
+                return; // Don't search for very short queries
+            }
+            
+            try {
+                // Show loading indicator if needed
+                console.log(`Searching for: ${query}`);
+                
+                // Build Nominatim API URL - respecting usage policy
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
+                
+                // Add required User-Agent header for Nominatim
+                const response = await fetch(url, {
+                    headers: {
+                        'User-Agent': 'WeatherMapApplication/1.0'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Process results
+                if (data && data.length > 0) {
+                    const result = data[0];
+                    const lat = parseFloat(result.lat);
+                    const lon = parseFloat(result.lon);
+                    
+                    console.log(`Found location: ${result.display_name} at ${lat}, ${lon}`);
+                    
+                    // Create a custom search result marker
+                    const searchMarker = L.marker([lat, lon], {
+                        icon: L.icon({
+                            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+                            shadowSize: [41, 41]
+                        }),
+                        title: result.display_name
+                    }).addTo(map);
+                    
+                    // Set view to found location
+                    map.setView([lat, lon], 12);
+                    
+                    // Remove marker after some time to clean up the map
+                    setTimeout(() => {
+                        map.removeLayer(searchMarker);
+                    }, 8000);
+                    
+                    return true;
+                } else {
+                    console.log('No results found');
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error searching location:", error);
+                return false;
+            }
+        }
+        
+        // Function to get location suggestions
+        async function getSuggestions(query) {
+            if (!query || query.trim().length < 3) {
+                return []; // Don't search for very short queries
+            }
+            
+            try {
+                console.log(`Getting suggestions for: ${query}`);
+                
+                // Build Nominatim API URL - respecting usage policy
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`;
+                
+                // Add required User-Agent header for Nominatim
+                const response = await fetch(url, {
+                    headers: {
+                        'User-Agent': 'WeatherMapApplication/1.0'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return data.map(item => ({
+                    display_name: item.display_name,
+                    lat: item.lat,
+                    lon: item.lon
+                }));
+            } catch (error) {
+                console.error("Error fetching suggestions:", error);
+                return [];
+            }
+        }
+        
+        // Create suggestion dropdown
+        function createSuggestionDropdown(inputElement) {
+            // Ensure parent has relative positioning for proper dropdown placement
+            const parent = inputElement.parentNode;
+            parent.style.position = 'relative';
+            
+            // Create dropdown container with fixed positioning below input
+            const dropdown = document.createElement('div');
+            dropdown.className = 'absolute left-0 right-0 top-full mt-1 bg-white rounded-md shadow-lg z-[1100] max-h-60 overflow-y-auto hidden';
+            parent.appendChild(dropdown);
+            
+            return dropdown;
+        }
+        
+        // Display suggestions in dropdown
+        function showSuggestions(suggestions, dropdown, inputElement) {
+            // Clear previous suggestions
+            dropdown.innerHTML = '';
+            
+            if (suggestions.length === 0) {
+                dropdown.classList.add('hidden');
+                return;
+            }
+            
+            // Create suggestion items
+            suggestions.forEach(suggestion => {
+                const item = document.createElement('div');
+                item.className = 'px-4 py-2 hover:bg-blue-100 cursor-pointer text-gray-800 text-sm';
+                item.textContent = suggestion.display_name;
+                
+                // Handle suggestion click
+                item.addEventListener('click', () => {
+                    inputElement.value = suggestion.display_name;
+                    dropdown.classList.add('hidden');
+                    
+                    // Search for the selected location
+                    map.setView([parseFloat(suggestion.lat), parseFloat(suggestion.lon)], 12);
+                    
+                    // Create marker for the selected location
+                    const searchMarker = L.marker([parseFloat(suggestion.lat), parseFloat(suggestion.lon)], {
+                        icon: L.icon({
+                            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+                            shadowSize: [41, 41]
+                        }),
+                        title: suggestion.display_name
+                    }).addTo(map);
+                    
+                    // Remove marker after some time
+                    setTimeout(() => {
+                        map.removeLayer(searchMarker);
+                    }, 8000);
+                    
+                    // Remove focus from input
+                    inputElement.blur();
+                });
+                
+                dropdown.appendChild(item);
+            });
+            
+            dropdown.classList.remove('hidden');
+        }
+        
+        // Connect search bar inputs to Nominatim search
+        document.addEventListener('DOMContentLoaded', function() {
+            // Desktop search
+            const desktopSearchInput = document.querySelector('.md\\:flex .relative input');
+            if (desktopSearchInput) {
+                // Ensure parent has proper positioning context
+                const desktopSearchContainer = desktopSearchInput.closest('.relative');
+                if (desktopSearchContainer) {
+                    desktopSearchContainer.style.position = 'relative';
+                }
+                
+                const desktopDropdown = createSuggestionDropdown(desktopSearchInput);
+                
+                // Handle input for suggestions
+                let debounceTimeout;
+                desktopSearchInput.addEventListener('input', function() {
+                    clearTimeout(debounceTimeout);
+                    debounceTimeout = setTimeout(async () => {
+                        if (this.value.length >= 3) {
+                            const suggestions = await getSuggestions(this.value);
+                            showSuggestions(suggestions, desktopDropdown, desktopSearchInput);
+                        } else {
+                            desktopDropdown.classList.add('hidden');
+                        }
+                    }, 300);
+                });
+                
+                // Handle Enter key
+                desktopSearchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        searchLocation(this.value);
+                        this.blur();
+                        desktopDropdown.classList.add('hidden');
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!desktopSearchInput.contains(e.target) && !desktopDropdown.contains(e.target)) {
+                        desktopDropdown.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // Mobile search
+            const mobileSearchInput = document.querySelector('.md\\:hidden input');
+            if (mobileSearchInput) {
+                // Ensure parent container has proper positioning
+                const mobileSearchContainer = mobileSearchInput.parentNode;
+                mobileSearchContainer.style.position = 'relative';
+                
+                const mobileDropdown = createSuggestionDropdown(mobileSearchInput);
+                
+                // Handle input for suggestions
+                let mobileDebounceTimeout;
+                mobileSearchInput.addEventListener('input', function() {
+                    clearTimeout(mobileDebounceTimeout);
+                    mobileDebounceTimeout = setTimeout(async () => {
+                        if (this.value.length >= 3) {
+                            const suggestions = await getSuggestions(this.value);
+                            showSuggestions(suggestions, mobileDropdown, mobileSearchInput);
+                        } else {
+                            mobileDropdown.classList.add('hidden');
+                        }
+                    }, 300);
+                });
+                
+                // Handle Enter key
+                mobileSearchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        searchLocation(this.value);
+                        this.blur();
+                        mobileDropdown.classList.add('hidden');
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!mobileSearchInput.contains(e.target) && !mobileDropdown.contains(e.target)) {
+                        mobileDropdown.classList.add('hidden');
+                    }
+                });
+            }
+        });
+        
+        // Function to fetch markers based on map bounds
+        async function fetchMarkersByBounds() {
+            const bounds = map.getBounds();
+            const xmin = bounds.getWest().toFixed(6);
+            const ymin = bounds.getSouth().toFixed(6);
+            const xmax = bounds.getEast().toFixed(6);
+            const ymax = bounds.getNorth().toFixed(6);
+            
+            const url = `https://api.oklabflensburg.de/climate/v1/mosmix/bounds?xmin=${xmin}&ymin=${ymin}&xmax=${xmax}&ymax=${ymax}`;
+            
+            try {
+                console.log(`Fetching markers from: ${url}`);
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error fetching markers:", error);
+                return [];
+            }
+        }
+
+        // Function to update markers on the map
+        async function updateMarkers() {
+            try {
+                // Remember selected marker coordinates
+                const prevSelectedLatLng = selectedMarkerLatLng;
+                
+                // Show loading indicator or message here if needed
+                
+                // Fetch markers within current bounds
+                const markerData = await fetchMarkersByBounds();
+                
+                // Clear existing markers
+                markersLayer.clearLayers();
+                if (currentSelectedMarker) {
+                    currentSelectedMarker = null;
+                }
+                
+                // Process and add new markers
+                if (markerData && markerData.features) {
+                    markerData.features.forEach(feature => {
+                        if (feature.geometry && feature.geometry.coordinates) {
+                            const longitude = feature.geometry.coordinates[0];
+                            const latitude = feature.geometry.coordinates[1];
+                            
+                            // Extract properties for marker info
+                            const properties = feature.properties || {};
+                            const title = properties.station_name || "Weather Station";
+                            let content = `Station ID: ${feature.id || 'N/A'}`;
+                            
+                            // Add weather data if available
+                            if (properties.temperature) {
+                                content += `Temperature: ${properties.temperature}°C`;
+                            }
+                            if (properties.precipitation) {
+                                content += `Precipitation: ${properties.precipitation} mm`;
+                            }
+                            if (properties.wind_speed) {
+                                content += `Wind Speed: ${properties.wind_speed} km/h`;
+                            }
+                            
+                            // Create and add marker
+                            const mapMarker = L.marker([latitude, longitude], {
+                                icon: defaultIcon,
+                                title: title
+                            });
+                            
+                            // If this is our previously selected marker, highlight it
+                            if (prevSelectedLatLng && 
+                                Math.abs(prevSelectedLatLng[0] - latitude) < 0.0001 && 
+                                Math.abs(prevSelectedLatLng[1] - longitude) < 0.0001) {
+                                mapMarker.setIcon(highlightedIcon);
+                                currentSelectedMarker = mapMarker;
+                            }
+                            
+                            // Set up click handler
+                            mapMarker.on('click', function(e) {
+                                // Stop event propagation
+                                if (e.originalEvent) {
+                                    e.originalEvent.stopPropagation();
+                                }
+                                
+                                // Reset previous selected marker if exists
+                                if (currentSelectedMarker && currentSelectedMarker !== mapMarker) {
+                                    currentSelectedMarker.setIcon(defaultIcon);
+                                }
+                                
+                                // Highlight current marker (ensure it's done even if clicked again)
+                                mapMarker.setIcon(highlightedIcon);
+                                currentSelectedMarker = mapMarker;
+                                
+                                // Store selected marker location to restore highlighting after map updates
+                                selectedMarkerLatLng = [latitude, longitude];
+                                
+                                // Set flag to indicate we're zooming to a marker
+                                isZoomingToMarker = true;
+                                
+                                // Zoom and center map on the clicked marker
+                                map.setView([latitude, longitude], 15, {
+                                    animate: true,
+                                    duration: 0.5
+                                });
+                                
+                                // Show details
+                                showDetails(title, content);
+                            });
+                            
+                            // Add to marker cluster instead of regular layer
+                            markersLayer.addLayer(mapMarker);
+                        }
+                    });
+                }
+                
+                // Reset the zooming flag
+                isZoomingToMarker = false;
+                
+                // If no markers were added, you might want to show a message
+                if (markersLayer.getLayers().length === 0) {
+                    console.log("No markers found in the current view.");
+                }
+            } catch (error) {
+                console.error("Error updating markers:", error);
+            }
+        }
+
+        // Add debounce function to avoid too many API calls
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Add event listener to map for when bounds change - modified to avoid refreshing during zooms to markers
+        map.on('moveend', function() {
+            // Only update markers if we're not zooming to a specific marker
+            if (!isZoomingToMarker) {
+                debounce(updateMarkers, 300)();
+            } else {
+                // Reset the flag after a short delay to ensure it doesn't get stuck
+                setTimeout(() => {
+                    isZoomingToMarker = false;
+                }, 500);
+            }
+        });
+
+        // Initial load of markers
+        updateMarkers();
+
+        // Direct click handler on the map container
+        const mapContainer = document.getElementById('map');
+        
+        mapContainer.addEventListener('click', function(e) {
+            // Check if we clicked directly on the map (not on a marker)
+            if (e.target.classList.contains('leaflet-tile') || 
+                e.target.classList.contains('leaflet-container') ||
+                e.target.id === 'map') {
+                
+                console.log('MAP ELEMENT CLICKED - target:', e.target);
+                
+                // Force hide the panel
+                if (detailsPanel.classList.contains('visible')) {
+                    hideDetails();
+                    
+                    // Force apply transform immediately
+                    if (window.innerWidth >= 768) {
+                        detailsPanel.style.transform = 'translateX(-100%)';
+                    } else {
+                        detailsPanel.style.transform = 'translateY(100%)';
+                    }
+                }
+            }
+        });
+        
+        // Bottom sheet functionality
+        const detailsPanel = document.getElementById('details-panel');
+        const dragHandle = document.getElementById('drag-handle');
+        const mainContent = document.getElementById('main-content');
+        let startY, startTranslate, currentTranslate = 0;
+
+        function showDetails(title, content) {
+            console.log('Showing details for:', title);
+            
+            document.getElementById('marker-title').textContent = title;
+            document.getElementById('marker-content').textContent = content;
+            
+            // Reset transform state
+            currentTranslate = 0;
+            
+            // First remove all transforms to start fresh
+            detailsPanel.style.removeProperty('transform');
+            
+            // Apply correct transform based on viewport size
+            if (window.innerWidth >= 768) {
+                // For desktop (sidebar)
+                detailsPanel.classList.remove('translate-y-full', 'translate-y-0');
+                detailsPanel.classList.remove('-translate-x-full');
+                detailsPanel.classList.add('translate-x-0');
+                // Force the transform to be applied immediately
+                detailsPanel.style.transform = 'translateX(0)';
+                // Don't adjust the container width as it's now full width
+            } else {
+                detailsPanel.classList.remove('-translate-x-full', 'translate-x-0');
+                detailsPanel.classList.remove('translate-y-full');
+                detailsPanel.classList.add('translate-y-0');
+                // Force the transform to be applied immediately
+                detailsPanel.style.transform = 'translateY(0)';
+            }
+            
+            // Ensure visibility
+            detailsPanel.classList.add('visible');
+            
+            // Force reflow to ensure transition applies correctly
+            void detailsPanel.offsetWidth;
+        }
+
+        function hideDetails() {
+            // Reset currently selected marker if exists
+            if (currentSelectedMarker) {
+                currentSelectedMarker.setIcon(defaultIcon);
+                currentSelectedMarker = null;
+            }
+            
+            if (window.innerWidth >= 768) {
+                detailsPanel.classList.add('-translate-x-full');
+                detailsPanel.classList.remove('translate-x-0');
+                // Don't adjust container as it's now full width
+            } else {
+                detailsPanel.classList.add('translate-y-full');
+                detailsPanel.classList.remove('translate-y-0');
+                currentTranslate = 100;
+            }
+            
+            detailsPanel.classList.remove('visible');
+        }
+
+        // Swipe functionality for mobile
+        dragHandle.addEventListener('mousedown', dragStart);
+        dragHandle.addEventListener('touchstart', dragStart, { passive: true });
+        window.addEventListener('mouseup', dragEnd);
+        window.addEventListener('touchend', dragEnd);
+
+        function dragStart(e) {
+            if (window.innerWidth >= 768) return; // Only for mobile
+            
+            startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+            startTranslate = currentTranslate;
+            window.addEventListener('mousemove', drag);
+            window.addEventListener('touchmove', drag, { passive: false });
+        }
+
+        function drag(e) {
+            e.preventDefault();
+            const currentY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+            const diffY = currentY - startY;
+            
+            if (diffY < 0) {
+                // Swiping up - expand to full
+                currentTranslate = Math.max(0, startTranslate + diffY);
+            } else {
+                // Swiping down - collapse
+                currentTranslate = Math.min(100, startTranslate + diffY);
+            }
+            
+            detailsPanel.style.transform = `translateY(${currentTranslate}%)`;
+        }
+
+        function dragEnd() {
+            window.removeEventListener('mousemove', drag);
+            window.removeEventListener('touchmove', drag);
+            
+            // Snap to positions
+            if (currentTranslate > 50) {
+                // Close if pulled down more than 50%
+                hideDetails();
+            } else {
+                // Open fully if pulled down less than 50%
+                currentTranslate = 0;
+                detailsPanel.style.transform = 'translateY(0%)';
+            }
+        }
+
+        // Handle window resize for responsive behavior
+        window.addEventListener('resize', function() {
+            if (detailsPanel.classList.contains('visible')) {
+                if (window.innerWidth >= 768) {
+                    detailsPanel.classList.add('translate-x-0');
+                    detailsPanel.classList.remove('translate-y-0', 'translate-y-full');
+                    detailsPanel.style.transform = '';
+                    // Don't adjust container margins/padding
+                } else {
+                    detailsPanel.classList.add('translate-y-0');
+                    detailsPanel.classList.remove('translate-x-0', '-translate-x-full');
+                    detailsPanel.style.transform = '';
+                }
+            } else {
+                if (window.innerWidth >= 768) {
+                    detailsPanel.classList.add('-translate-x-full');
+                    detailsPanel.classList.remove('translate-y-full');
+                    detailsPanel.style.transform = '';
+                } else {
+                    detailsPanel.classList.add('translate-y-full');
+                    detailsPanel.classList.remove('-translate-x-full');
+                    detailsPanel.style.transform = '';
+                }
+            }
+        });
+
+        // Ensure all marker icons have proper z-index to be clickable
+        map.on('layeradd', function(e) {
+            if (e.layer instanceof L.Marker) {
+                setTimeout(() => {
+                    const markerIcon = e.layer.getElement();
+                    if (markerIcon) {
+                        markerIcon.style.zIndex = "1001";
+                    }
+                }, 100);
+            }
+        });
+    </script>
 </body>
 </html>
