@@ -1,5 +1,6 @@
 import click
 import sys
+import csv
 from typing import List
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
@@ -13,6 +14,7 @@ class Station:
     latitude: float
     longitude: float
     elevation: float
+    icao_code: str = ""
 
 
 def parse_mosmix_kml(kml_file: str) -> List[Station]:
@@ -25,7 +27,6 @@ def parse_mosmix_kml(kml_file: str) -> List[Station]:
         List of Station objects.
     '''
     try:
-        # Parse the KML file
         namespaces = {
             'kml': 'http://www.opengis.net/kml/2.2',
             'dwd': (
@@ -50,13 +51,16 @@ def parse_mosmix_kml(kml_file: str) -> List[Station]:
             id_elem = placemark.find('./kml:name', namespaces)
             station_id = id_elem.text if id_elem is not None else "Unknown"
 
+            icao_code = ''
+
             # Extract coordinates
             coords_elem = placemark.find('.//kml:coordinates', namespaces)
             if coords_elem is not None and coords_elem.text:
                 # Coordinates are in format: longitude,latitude,elevation
                 lon, lat, elev = map(float, coords_elem.text.split(','))
                 stations.append(Station(id=station_id, name=name,
-                                latitude=lat, longitude=lon, elevation=elev))
+                                latitude=lat, longitude=lon, elevation=elev,
+                                icao_code=icao_code))
 
         return stations
     except Exception as e:
@@ -72,28 +76,54 @@ def parse_mosmix_kml(kml_file: str) -> List[Station]:
     default='text',
     help='Output format (text, csv, json)'
 )
-def main(kml_file, output):
-    '''Main function to parse command line arguments and execute the parsing.'''
+@click.option(
+    '-f', '--output-file',
+    type=click.Path(),
+    help='Write output to a file instead of stdout'
+)
+def main(kml_file, output, output_file):
+    '''
+    Main function to parse command line arguments and execute the parsing.
+    '''
     stations = parse_mosmix_kml(kml_file)
 
     if not stations:
         click.echo("No stations found or error parsing the file.", err=True)
         return 1
 
-    # Output the result
     if output.lower() == 'text':
         click.echo(f"Found {len(stations)} stations:")
         for station in stations:
-            click.echo(f"ID: {station.id}, Name: {station.name}, "
+            icao_info = (
+                f", ICAO: {station.icao_code}" if station.icao_code else ""
+            )
+            click.echo(f"ID: {station.id}, Name: {station.name}{icao_info}, "
                        f"Lat: {station.latitude}, Lon: {station.longitude}, "
                        f"Elev: {station.elevation}m")
     elif output.lower() == 'csv':
-        click.echo("id,name,latitude,longitude,elevation")
-        for station in stations:
-            click.echo(
-                f"{station.id},{station.name},{station.latitude},"
-                f"{station.longitude},{station.elevation}"
-            )
+        if output_file:
+            try:
+                with open(output_file, 'w', newline='') as f:
+                    csv_writer = csv.writer(f, quoting=csv.QUOTE_ALL)
+                    csv_writer.writerow(["id", "name", "latitude", "longitude", "elevation", "icao_code"])
+                    for station in stations:
+                        csv_writer.writerow([
+                            station.id, station.name, station.latitude,
+                            station.longitude, station.elevation, station.icao_code
+                        ])
+                click.echo(f"CSV data written to {output_file}")
+            except IOError as e:
+                click.echo(f"Error writing to file {output_file}: {e}", err=True)
+                return 1
+        else:
+            output_buffer = sys.stdout
+            csv_writer = csv.writer(output_buffer, quoting=csv.QUOTE_ALL)
+            csv_writer.writerow(["id", "name", "latitude", "longitude", "elevation", "icao_code"])
+            for station in stations:
+                csv_writer.writerow([
+                    station.id, station.name, station.latitude,
+                    station.longitude, station.elevation, station.icao_code
+                ])
     elif output.lower() == 'json':
         import json
         click.echo(json.dumps([vars(s) for s in stations], indent=2))

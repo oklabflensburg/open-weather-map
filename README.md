@@ -5,6 +5,15 @@ Hier soll eine interaktive Karte mit den Wetterdaten des Deutschen Wetterdienste
 
 
 
+```sh
+cd tools
+source venv/bin/activate
+pip3 install -r requirements.txt
+python3 insert_mosmix_stations.py --env ../.env --src ../data/mosmix_stations.csv --verbose
+deactivate
+```
+
+
 ---
 
 

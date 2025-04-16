@@ -266,7 +266,7 @@
                 console.log(`Getting suggestions for: ${query}`);
                 
                 // Build Nominatim API URL - respecting usage policy
-                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`;
+                const url = `https://nominatim.oklabflensburg.de/search?format=json&q=${encodeURIComponent(query)}&limit=5`;
                 
                 // Add required User-Agent header for Nominatim
                 const response = await fetch(url, {
