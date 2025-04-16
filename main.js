@@ -558,19 +558,12 @@ function getWindDirectionIcon(degrees) {
 
 // Helper function to format sun duration in German
 function formatSunDuration(minutes) {
-    if (minutes === undefined || minutes === 0) return 'Keine'
-
-    // Convert minutes to hours and minutes
-    const hours = Math.floor(minutes / 60)
-    const mins = minutes % 60
-
-    if (hours === 0) {
-        return `${mins} Min`
-    } else if (mins === 0) {
-        return `${hours} Std`
-    } else {
-        return `${hours} Std ${mins} Min`
+    // Handle all invalid cases: undefined, null, NaN, 0, or negative values
+    if (minutes === undefined || minutes === null || isNaN(minutes) || minutes <= 0) {
+        return 'Keine'
     }
+
+    return Math.round(parseFloat(minutes) / 60) + ' Min'
 }
 
 // Function to update markers on the map
