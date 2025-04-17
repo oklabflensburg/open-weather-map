@@ -27,7 +27,10 @@ export default defineNuxtConfig({
         phone: process.env.NUXT_PUBLIC_COMPANY_PHONE,
         responsiblePerson: process.env.NUXT_PUBLIC_COMPANY_RESPONSIBLE,
         domain: process.env.NUXT_PUBLIC_COMPANY_DOMAIN
-      }
+      },
+
+      // API endpoints
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL
     }
   },
 

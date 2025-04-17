@@ -18,14 +18,19 @@
       </template>
     </ClientOnly>
     
-    <!-- Details Panel Component -->
-    <DetailsPanel 
-      ref="detailsRef"
-      :title="markerTitle" 
-      :content="markerContent" 
-      :is-visible="detailsPanelVisible"
-      @close="hideDetailsPanel"
-    />
+    <ClientOnly>
+      <DetailsPanel 
+        ref="detailsRef"
+        :title="markerTitle" 
+        :content="markerContent" 
+        :is-visible="detailsPanelVisible"
+        @close="hideDetailsPanel"
+      />
+      <template #fallback>
+        <!-- Fallback content for SSR -->
+        <div class="hidden">Loading details panel...</div>
+      </template>
+    </ClientOnly>
   </div>
 </template>
 

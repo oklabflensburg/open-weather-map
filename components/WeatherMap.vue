@@ -11,7 +11,7 @@ export default {
 </script>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, defineEmits, nextTick } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 
 const emit = defineEmits(['marker-click', 'map-click'])
 

@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue'
+import { ref } from 'vue'
 import { useSearch } from '~/composables/useSearch'
 
 const props = defineProps({
