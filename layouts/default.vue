@@ -7,11 +7,11 @@
     />
     
     <!-- Main Content -->
-    <main class="flex-grow flex flex-col w-full">
+    <main class="flex-grow flex flex-col w-full" @mouse-move="handleMapMouseMove">
       <slot />
     </main>
 
-    <!-- Use footer component -->
+    <!-- Use footer component with mouse position -->
     <TheFooter />
   </div>
 </template>
@@ -19,6 +19,7 @@
 <script setup>
 import { computed } from 'vue'
 
+// Get reference to current page component
 const route = useRoute()
 const page = computed(() => route.meta.pageComponent)
 

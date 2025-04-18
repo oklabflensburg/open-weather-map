@@ -18,7 +18,7 @@
     >
       <div
         v-for="suggestion in suggestions"
-        :key="suggestion.display_name"
+        :key="suggestion.osm_id"
         @mousedown.prevent="selectSuggestion(suggestion)"
         class="px-4 py-3 hover:bg-blue-100 cursor-pointer text-gray-800 text-sm"
       >
@@ -31,6 +31,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useSearch } from '~/composables/useSearch'
+import { useSearchState } from '~/composables/useSearchState'
 
 const props = defineProps({
     mode: {
@@ -54,6 +55,7 @@ const searchInput = ref(null)
 
 // Import search functionality
 const { getSuggestions } = useSearch()
+const searchState = useSearchState()
 
 // Methods
 let debounceTimeout
@@ -77,18 +79,40 @@ function handleInput() {
 }
 
 function handleEnter() {
+  // Update the shared state instead of just emitting
+  searchState.setSearchQuery(searchQuery.value)
+  
+  // Still emit for backward compatibility
   emit('search', searchQuery.value)
+  
   searchInput.value?.blur()
   showDropdown.value = false
 }
 
 function selectSuggestion(suggestion) {
   searchQuery.value = suggestion.display_name
+  
+  // Update the shared state with all the polygon information
+  searchState.setSelectedLocation({
+    display_name: suggestion.display_name,
+    lat: suggestion.lat,
+    lon: suggestion.lon,
+    geojson: suggestion.geojson,
+    osm_type: suggestion.osm_type,
+    osm_id: suggestion.osm_id
+  })
+  
+  // Still emit for backward compatibility
   emit('select-location', {
     display_name: suggestion.display_name,
     lat: suggestion.lat,
-    lon: suggestion.lon
+    lon: suggestion.lon,
+    // Include other properties for components that directly use this event
+    geojson: suggestion.geojson,
+    osm_type: suggestion.osm_type,
+    osm_id: suggestion.osm_id
   })
+  
   showDropdown.value = false
   searchInput.value?.blur()
 }

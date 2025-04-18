@@ -6,6 +6,7 @@
         ref="mapRef" 
         @marker-click="handleMarkerClick" 
         @map-click="hideDetailsPanel"
+        @mouse-move="handleMouseCoordinates"
       />
       <template #fallback>
         <div class="w-full h-full flex-grow flex items-center justify-center bg-gray-100">
@@ -36,6 +37,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useWeatherData } from '~/composables/useWeatherData'
+import { useMapCoordinates } from '~/composables/useMapCoordinates'
 
 // Component refs
 const mapRef = ref(null)
@@ -80,6 +82,11 @@ function hideDetailsPanel() {
   if (mapRef.value) {
     mapRef.value.resetSelectedMarker()
   }
+}
+
+// Handle map mouse coordinates and forward to layout
+function handleMouseCoordinates(coords) {
+  useMapCoordinates().setCoordinates(coords)
 }
 
 // New functions to handle events from TheNavigation component

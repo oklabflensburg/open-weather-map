@@ -11,14 +11,26 @@ export default {
 </script>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick, watch, computed } from 'vue'
 
-const emit = defineEmits(['marker-click', 'map-click'])
+// Import the search state composable
+import { useSearchState } from '~/composables/useSearchState'
+import { useSearch } from '~/composables/useSearch'
+
+// Get runtime config for API URLs
+const config = useRuntimeConfig()
+const weatherApiBaseUrl = computed(() => config.public.weatherApiBaseUrl)
+
+const searchState = useSearchState()
+const { getLocationDetails } = useSearch()
+
+const emit = defineEmits(['marker-click', 'map-click', 'mouse-move'])
 
 // Refs
 const mapContainer = ref(null)
 const map = ref(null)
 const markersLayer = ref(null)
+const searchOverlayLayer = ref(null)
 
 // State
 const currentSelectedMarker = ref(null)
@@ -119,10 +131,14 @@ async function initLeaflet() {
       }
     }).addTo(map.value)
 
+    // Create a layer group for search overlays (polygons, etc)
+    searchOverlayLayer.value = L.layerGroup().addTo(map.value)
+
     // Map event listeners
     map.value.on('moveend', handleMapMoveEnd)
     map.value.on('click', handleMapClick)
     map.value.on('zoomstart', handleZoomStart)
+    map.value.on('mousemove', handleMouseMove)
 
     // Initial load of markers
     updateMarkers()
@@ -134,8 +150,14 @@ async function initLeaflet() {
 onBeforeUnmount(() => {
   // Clean up Leaflet map on component unmount
   if (map.value) {
+    map.value.off('mousemove', handleMouseMove)
     map.value.remove()
     map.value = null
+  }
+
+  // Clear any search overlays
+  if (searchOverlayLayer.value) {
+    searchOverlayLayer.value.clearLayers()
   }
 })
 
@@ -177,6 +199,20 @@ function handleZoomStart() {
     : isZoomingToMarker.value
 }
 
+function handleMouseMove(e) {
+  if (!map.value) return
+  
+  // Get the latitude and longitude from the mouse event
+  const { lat, lng } = e.latlng
+  
+  // Format to 6 decimal places
+  const formattedLat = lat.toFixed(6)
+  const formattedLng = lng.toFixed(6)
+  
+  // Emit the coordinates to parent components
+  emit('mouse-move', { lat: formattedLat, lng: formattedLng })
+}
+
 // Helper functions
 let debounceTimeout
 function debouncedUpdateMarkers() {
@@ -189,7 +225,7 @@ async function fetchMarkersByBounds() {
   if (!map.value) return []
   
   const bounds = map.value.getBounds()
-  const url = `https://api.oklabflensburg.de/climate/v1/mosmix/bounds?xmin=${bounds.getWest().toFixed(6)}&ymin=${bounds.getSouth().toFixed(6)}&xmax=${bounds.getEast().toFixed(6)}&ymax=${bounds.getNorth().toFixed(6)}`
+  const url = `${weatherApiBaseUrl.value}/climate/v1/mosmix/bounds?xmin=${bounds.getWest().toFixed(6)}&ymin=${bounds.getSouth().toFixed(6)}&xmax=${bounds.getEast().toFixed(6)}&ymax=${bounds.getNorth().toFixed(6)}`
   
   try {
     const response = await fetch(url)
@@ -296,34 +332,6 @@ function resetSelectedMarker() {
   selectedMarkerLatLng.value = null
 }
 
-function searchLocation(query) {
-  if (!query || query.trim().length < 3 || !map.value || !L) return false
-  
-  return new Promise(async (resolve) => {
-    try {
-      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`
-      const response = await fetch(url, {
-        headers: { 'User-Agent': 'WeatherMapApplication/1.0' }
-      })
-      
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
-      const data = await response.json()
-      
-      if (data && data.length > 0) {
-        const result = data[0]
-        flyToLocation(result.lat, result.lon, 12)
-        addSearchMarker(result)
-        resolve(true)
-      } else {
-        resolve(false)
-      }
-    } catch (error) {
-      console.error("Error searching location:", error)
-      resolve(false)
-    }
-  })
-}
-
 function flyToLocation(lat, lon, zoom) {
   if (!map.value) return
   
@@ -333,46 +341,86 @@ function flyToLocation(lat, lon, zoom) {
   })
 }
 
-function addSearchMarker(location) {
-  if (!map.value || !searchIcon || !L) return
+function addGeoJsonToMap(geojson, name) {
+  if (!map.value || !L || !searchOverlayLayer.value) return
   
-  const marker = L.marker([parseFloat(location.lat), parseFloat(location.lon)], {
-    icon: searchIcon,
-    title: location.display_name
-  }).addTo(map.value)
-  
-  setTimeout(() => {
-    if (map.value && marker) {
-      map.value.removeLayer(marker)
+  try {
+    // Add the GeoJSON to the map with styling
+    const layer = L.geoJSON(geojson, {
+      style: {
+        color: '#3388ff',
+        weight: 4,
+        opacity: 0.7,
+        fillColor: '#3388ff',
+        fillOpacity: 0.1
+      },
+      onEachFeature: (feature, layer) => {
+        // Add a popup with the name
+        if (name) {
+          layer.bindPopup(name)
+        }
+      }
+    }).addTo(searchOverlayLayer.value)
+    
+    // Fit the map to the bounds of the layer
+    if (layer.getBounds) {
+      map.value.fitBounds(layer.getBounds(), {
+        padding: [50, 50] // Add some padding around the bounds
+      })
     }
-  }, 8000)
+    
+    // Remove after some time (optional)
+    setTimeout(() => {
+      if (map.value && searchOverlayLayer.value) {
+        searchOverlayLayer.value.removeLayer(layer)
+      }
+    }, 15000) // 15 seconds
+  } catch (error) {
+    console.error('Error adding GeoJSON to map:', error)
+  }
 }
+
+// Watch for search state changes
+watch(
+  () => searchState.isSearching.value,
+  async (isSearching) => {
+    if (isSearching) {
+      if (searchState.selectedLocation.value) {
+        // Handle location selection with polygon support
+        const location = searchState.selectedLocation.value
+        
+        // Clear previous overlays
+        if (searchOverlayLayer.value) {
+          searchOverlayLayer.value.clearLayers()
+        }
+        
+        // Show the location on the map (center and zoom)
+        flyToLocation(location.lat, location.lon, 12)
+        
+        // Handle polygon if available or try to fetch it
+        if (location.geojson) {
+          addGeoJsonToMap(location.geojson, location.display_name)
+        } else if (location.osm_type && location.osm_id) {
+          // Fetch detailed geometry if basic geojson is not included
+          const details = await getLocationDetails(location.osm_type, location.osm_id)
+          if (details && details.geometry) {
+            addGeoJsonToMap(details.geometry, location.display_name)
+          }
+        }
+        
+        searchState.markSearchHandled()
+      } else if (searchState.searchQuery.value) {
+        // Handle search query
+        await searchLocation(searchState.searchQuery.value)
+        searchState.markSearchHandled()
+      }
+    }
+  }
+)
 
 // Expose methods to parent components
 defineExpose({
-  searchLocation,
   flyToLocation,
-  addSearchMarker,
   resetSelectedMarker
 })
 </script>
-
-<style>
-/* These styles need to be global or scoped properly */
-.marker-cluster-small,
-.marker-cluster-medium,
-.marker-cluster-large {
-  background-clip: padding-box;
-  border-radius: 50%;
-}
-.marker-cluster div {
-  width: 30px;
-  height: 30px;
-  margin-left: 5px;
-  margin-top: 5px;
-  text-align: center;
-  border-radius: 50%;
-  font-size: 12px;
-  line-height: 30px;
-}
-</style>

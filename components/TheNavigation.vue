@@ -34,22 +34,26 @@
             :class="{'absolute z-[1000] w-full bg-gray-700': !isIndexPage}">
             <NuxtLink to="/" 
                 :class="{'text-blue-300 font-medium': isActive('/')}" 
-                class="block py-2 hover:text-blue-200">
+                class="block py-2 hover:text-blue-200"
+                @click="closeMobileMenu">
                 Home
             </NuxtLink>
             <NuxtLink to="/forecast" 
                 :class="{'text-blue-300 font-medium': isActive('/forecast')}" 
-                class="block py-2 hover:text-blue-200">
+                class="block py-2 hover:text-blue-200"
+                @click="closeMobileMenu">
                 Forecast
             </NuxtLink>
             <NuxtLink to="/radar" 
                 :class="{'text-blue-300 font-medium': isActive('/radar')}" 
-                class="block py-2 hover:text-blue-200">
+                class="block py-2 hover:text-blue-200"
+                @click="closeMobileMenu">
                 Radar
             </NuxtLink>
             <NuxtLink to="/about" 
                 :class="{'text-blue-300 font-medium': isActive('/about')}" 
-                class="block py-2 hover:text-blue-200">
+                class="block py-2 hover:text-blue-200"
+                @click="closeMobileMenu">
                 About
             </NuxtLink>
         </div>
@@ -116,6 +120,10 @@ function isActive(path) {
 
 function toggleMenu() {
   mobileMenuOpen.value = !mobileMenuOpen.value
+}
+
+function closeMobileMenu() {
+  mobileMenuOpen.value = false
 }
 
 // Handler functions - emit events to the parent component instead of directly accessing mapRef

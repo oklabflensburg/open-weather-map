@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     public: {
       // Default values will be overwritten by env vars with prefix NUXT_PUBLIC_
       nominatimBaseUrl: process.env.NUXT_PUBLIC_NOMINATIM_BASE_URL,
+      weatherApiBaseUrl: process.env.NUXT_PUBLIC_WEATHER_API_BASE_URL,
 
       // Company information
       company: {
