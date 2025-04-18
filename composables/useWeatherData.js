@@ -60,8 +60,8 @@ export const useWeatherData = () => {
         const minTemp = Math.min(...tempData.slice(0, 24))
         const totalPrecip = calculateSum(precipData.slice(0, 24))
 
-        html += `<p>Ø Temperatur nächste 24h: ${(avgTemp - 273.15).toFixed(1)}°C</p>`
-        html += `<p>Maximum: ${(maxTemp - 273.15).toFixed(1)}°C / Minimum: ${(minTemp - 273.15).toFixed(1)}°C</p>`
+        html += `<p>⌀ Temperatur nächste 24h: ${(avgTemp - 273.15).toFixed(1)}&#8239;°C</p>`
+        html += `<p>Maximum: ${(maxTemp - 273.15).toFixed(1)}&#8239;°C / Minimum: ${(minTemp - 273.15).toFixed(1)}&#8239;°C</p>`
         html += `<p>Niederschlag nächste 24h: ${totalPrecip.toFixed(1)} mm</p>`
         html += '</div>'
 
@@ -115,7 +115,7 @@ export const useWeatherData = () => {
             // Add forecast entry to this date group
             dateGroups[dateKey].entries.push({
                 time: formattedTime,
-                temp: tempCelsius !== null ? tempCelsius + '°C' : 'N/V',
+                temp: tempCelsius !== null ? tempCelsius + '&#8239;°C' : 'N/V',
                 wind: windSpeed !== null ? windSpeed + ' m/s' : 'N/V',
                 direction: windDirectionText || 'N/V',
                 directionIcon: windDirectionIcon,

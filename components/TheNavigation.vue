@@ -29,34 +29,44 @@
             </div>
         </div>
 
-        <!-- Mobile Menu -->
-        <div v-show="mobileMenuOpen" class="text-gray-100 md:hidden pl-5 pr-3"
-            :class="{'absolute z-[1000] w-full bg-gray-700': !isIndexPage}">
-            <NuxtLink to="/" 
-                :class="{'text-blue-300 font-medium': isActive('/')}" 
-                class="block py-2 hover:text-blue-200"
-                @click="closeMobileMenu">
-                Home
-            </NuxtLink>
-            <NuxtLink to="/forecast" 
-                :class="{'text-blue-300 font-medium': isActive('/forecast')}" 
-                class="block py-2 hover:text-blue-200"
-                @click="closeMobileMenu">
-                Forecast
-            </NuxtLink>
-            <NuxtLink to="/radar" 
-                :class="{'text-blue-300 font-medium': isActive('/radar')}" 
-                class="block py-2 hover:text-blue-200"
-                @click="closeMobileMenu">
-                Radar
-            </NuxtLink>
-            <NuxtLink to="/about" 
-                :class="{'text-blue-300 font-medium': isActive('/about')}" 
-                class="block py-2 hover:text-blue-200"
-                @click="closeMobileMenu">
-                About
-            </NuxtLink>
-        </div>
+        <!-- Mobile Menu with Transition -->
+        <transition
+            enter-active-class="transition-all duration-300 ease-out"
+            leave-active-class="transition-all duration-200 ease-in"
+            enter-from-class="opacity-0 max-h-0"
+            enter-to-class="opacity-100 max-h-64"
+            leave-from-class="opacity-100 max-h-64"
+            leave-to-class="opacity-0 max-h-0"
+        >
+            <div v-show="mobileMenuOpen" 
+                class="text-gray-100 md:hidden pl-5 pr-3 overflow-hidden"
+                :class="{'absolute z-[1000] w-full bg-gray-700': !isIndexPage}">
+                <NuxtLink to="/" 
+                    :class="{'text-blue-300 font-medium': isActive('/')}" 
+                    class="block py-2 hover:text-blue-200"
+                    @click="closeMobileMenu">
+                    Home
+                </NuxtLink>
+                <NuxtLink to="/forecast" 
+                    :class="{'text-blue-300 font-medium': isActive('/forecast')}" 
+                    class="block py-2 hover:text-blue-200"
+                    @click="closeMobileMenu">
+                    Forecast
+                </NuxtLink>
+                <NuxtLink to="/radar" 
+                    :class="{'text-blue-300 font-medium': isActive('/radar')}" 
+                    class="block py-2 hover:text-blue-200"
+                    @click="closeMobileMenu">
+                    Radar
+                </NuxtLink>
+                <NuxtLink to="/about" 
+                    :class="{'text-blue-300 font-medium': isActive('/about')}" 
+                    class="block py-2 hover:text-blue-200"
+                    @click="closeMobileMenu">
+                    About
+                </NuxtLink>
+            </div>
+        </transition>
     </nav>
 
     <!-- Desktop Navigation -->
@@ -138,3 +148,10 @@ function handleLocationSelect(location) {
 // Define emits
 const emit = defineEmits(['search', 'location-select'])
 </script>
+
+<style scoped>
+/* Ensure transition works properly for height animation */
+.transition-all {
+  transition-property: all;
+}
+</style>
