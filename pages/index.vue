@@ -1,6 +1,5 @@
 <template>
   <div class="w-full h-full flex-grow flex flex-col relative" id="main-content">
-    
     <!-- Map Component with ClientOnly wrapper -->
     <ClientOnly>
       <WeatherMap 
@@ -54,20 +53,6 @@ const markerContent = ref('')
 // Weather data composable
 const { fetchForecastData, formatForecastData } = useWeatherData()
 
-// Handler functions
-function handleSearch(query) {
-  if (mapRef.value) {
-    mapRef.value.searchLocation(query)
-  }
-}
-
-function handleLocationSelect(location) {
-  if (mapRef.value) {
-    mapRef.value.flyToLocation(location.lat, location.lon, 12)
-    mapRef.value.addSearchMarker(location)
-  }
-}
-
 async function handleMarkerClick(marker) {
   // Set initial state with loading indicator
   markerTitle.value = marker.title
@@ -97,8 +82,28 @@ function hideDetailsPanel() {
   }
 }
 
+// New functions to handle events from TheNavigation component
+function handleNavigationSearch(query) {
+  if (mapRef.value) {
+    mapRef.value.searchLocation(query)
+  }
+}
+
+function handleNavigationLocationSelect(location) {
+  if (mapRef.value) {
+    mapRef.value.flyToLocation(location.lat, location.lon, 12)
+    mapRef.value.addSearchMarker(location)
+  }
+}
+
 // Initialize and clean up
 onMounted(() => {
   // Any additional initialization if needed
+})
+
+// Expose methods for the navigation component to call
+defineExpose({
+  handleSearch: handleNavigationSearch,
+  handleLocationSelect: handleNavigationLocationSelect
 })
 </script>

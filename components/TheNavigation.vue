@@ -32,12 +32,29 @@
         <!-- Mobile Menu -->
         <div v-show="mobileMenuOpen" class="text-gray-100 md:hidden pl-5 pr-3"
             :class="{'absolute z-[1000] w-full bg-gray-700': !isIndexPage}">
-            <NuxtLink to="/" class="block py-2 hover:text-blue-200">Home</NuxtLink>
-            <NuxtLink to="/forecast" class="block py-2 hover:text-blue-200">Forecast</NuxtLink>
-            <NuxtLink to="/radar" class="block py-2 hover:text-blue-200">Radar</NuxtLink>
-            <NuxtLink to="/about" class="block py-2 hover:text-blue-200">About</NuxtLink>
+            <NuxtLink to="/" 
+                :class="{'text-blue-300 font-medium': isActive('/')}" 
+                class="block py-2 hover:text-blue-200">
+                Home
+            </NuxtLink>
+            <NuxtLink to="/forecast" 
+                :class="{'text-blue-300 font-medium': isActive('/forecast')}" 
+                class="block py-2 hover:text-blue-200">
+                Forecast
+            </NuxtLink>
+            <NuxtLink to="/radar" 
+                :class="{'text-blue-300 font-medium': isActive('/radar')}" 
+                class="block py-2 hover:text-blue-200">
+                Radar
+            </NuxtLink>
+            <NuxtLink to="/about" 
+                :class="{'text-blue-300 font-medium': isActive('/about')}" 
+                class="block py-2 hover:text-blue-200">
+                About
+            </NuxtLink>
         </div>
     </nav>
+
     <!-- Desktop Navigation -->
     <nav class="hidden md:block bg-gray-700 text-white shadow-lg">
         <div class="container-fluid mx-auto px-4">
@@ -56,10 +73,26 @@
                 
                 <div class="hidden md:flex items-center space-x-6">
                     <div class="flex space-x-4">
-                    <NuxtLink to="/" class="hover:text-blue-200">Home</NuxtLink>
-                    <NuxtLink to="/forecast" class="hover:text-blue-200">Forecast</NuxtLink>
-                    <NuxtLink to="/radar" class="hover:text-blue-200">Radar</NuxtLink>
-                    <NuxtLink to="/about" class="hover:text-blue-200">About</NuxtLink>
+                        <NuxtLink to="/" 
+                            :class="{'text-blue-300 border-b-2 border-blue-300': isActive('/')}" 
+                            class="hover:text-blue-200 pb-1">
+                            Home
+                        </NuxtLink>
+                        <NuxtLink to="/forecast" 
+                            :class="{'text-blue-300 border-b-2 border-blue-300': isActive('/forecast')}" 
+                            class="hover:text-blue-200 pb-1">
+                            Forecast
+                        </NuxtLink>
+                        <NuxtLink to="/radar" 
+                            :class="{'text-blue-300 border-b-2 border-blue-300': isActive('/radar')}" 
+                            class="hover:text-blue-200 pb-1">
+                            Radar
+                        </NuxtLink>
+                        <NuxtLink to="/about" 
+                            :class="{'text-blue-300 border-b-2 border-blue-300': isActive('/about')}" 
+                            class="hover:text-blue-200 pb-1">
+                            About
+                        </NuxtLink>
                     </div>
                 </div>
             </div>
@@ -76,11 +109,16 @@ const isIndexPage = computed(() => {
   return route.path === '/' || route.name === 'index'
 })
 
+// Helper method to check if route is active
+function isActive(path) {
+  return route.path === path
+}
+
 function toggleMenu() {
   mobileMenuOpen.value = !mobileMenuOpen.value
 }
 
-// Handle search functions - emitting events up to the parent
+// Handler functions - emit events to the parent component instead of directly accessing mapRef
 function handleSearch(query) {
   emit('search', query)
 }

@@ -9,7 +9,7 @@
       type="text"
       :placeholder="mode === 'mobile' ? 'Ort' : 'Ort suchen'"
       :class="mobileMenuOpen ? 'border border-gray-400' : 'border-0'"
-      class="w-full px-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-600"
+      class="w-full px-4 py-2 text-gray-900 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-600"
     />
 
     <div

@@ -1,28 +1,37 @@
 <template>
   <div class="flex flex-col min-h-screen bg-gray-100">
-    <!-- Use the navigation component -->
-    <TheNavigation />
+    <!-- Navigation with event handlers -->
+    <TheNavigation 
+      @search="handleSearch" 
+      @location-select="handleLocationSelect" 
+    />
     
     <!-- Main Content -->
     <main class="flex-grow flex flex-col w-full">
       <slot />
     </main>
-    
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-2">
-      <div class="container-fluid mx-auto px-4">
-        <div class="flex flex-col md:flex-row justify-center md:justify-end items-center">
-          <div class="flex space-x-4">
-            <NuxtLink to="/terms" class="hover:text-blue-300">Impressum</NuxtLink>
-            <NuxtLink to="/privacy" class="hover:text-blue-300">Datenschutz</NuxtLink>
-            <NuxtLink to="/contact" class="hover:text-blue-300">Kontakt</NuxtLink>
-          </div>
-        </div>
-      </div>
-    </footer>
+
+    <!-- Use footer component -->
+    <TheFooter />
   </div>
 </template>
 
 <script setup>
-// Navigation moved to its own component
+import { computed } from 'vue'
+
+const route = useRoute()
+const page = computed(() => route.meta.pageComponent)
+
+// Forward navigation events to the index page component if on index route
+function handleSearch(query) {
+  if (route.name === 'index' && page.value?.handleSearch) {
+    page.value.handleSearch(query)
+  }
+}
+
+function handleLocationSelect(location) {
+  if (route.name === 'index' && page.value?.handleLocationSelect) {
+    page.value.handleLocationSelect(location)
+  }
+}
 </script>
