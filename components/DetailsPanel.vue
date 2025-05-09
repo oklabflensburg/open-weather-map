@@ -1,11 +1,3 @@
-<script>
-// Use defineComponent with ssr: false to make this component client-only
-export default {
-  name: 'DetailsPanel',
-  ssr: false
-}
-</script>
-
 <template>
   <div
     id="details-panel"

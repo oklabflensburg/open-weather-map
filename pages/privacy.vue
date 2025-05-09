@@ -1,6 +1,5 @@
 <template>
 <div class="container mx-auto px-4 py-6 md:pt-12">
-
     <h2 class="text-2xl font-semibold  mb-3">Datenschutzerklärung</h2>
     <p class="mb-4">
       Das {{ company.name }}, {{ company.street }}, {{ company.zipCode }} {{ company.city }}, Deutschland (nachfolgend als "{{ company.name }}" oder "wir" bezeichnet) betreibt die im Internet unter https://{{ company.domain }} und den jeweils dazu gehörenden Unterverzeichnissen abrufbare Internetseite (nachfolgend die "Website" genannt).
@@ -172,7 +171,11 @@
 <script setup>
 // Import company info composable
 import { useCompanyInfo } from '~/composables/useCompanyInfo'
+import { usePageMode } from '~/composables/usePageMode'
+const { setPageMode, currentPageMode } = usePageMode()
 
+
+setPageMode('default')
 // Get company info
 const company = useCompanyInfo()
 </script>

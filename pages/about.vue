@@ -86,4 +86,10 @@
 
 <script setup>
 // About page setup
+import { usePageMode } from '~/composables/usePageMode'
+const { setPageMode, currentPageMode } = usePageMode()
+
+
+setPageMode('default')
+
 </script>

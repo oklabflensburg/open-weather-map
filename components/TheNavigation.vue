@@ -3,14 +3,7 @@
         :class="{'bg-gray-700 shadow-lg': mobileMenuOpen, 'absolute': isIndexPage}"> 
         <div class="flex flex-grow mx-auto p-3 space-x-2 items-center"
             :class="{'justify-end bg-gray-700 border-b border-gray-100': !isIndexPage}">
-            <SearchBar 
-                v-if="isIndexPage"
-                mode="mobile"
-                :mobileMenuOpen="mobileMenuOpen"
-                @search="handleSearch" 
-                @select-location="handleLocationSelect" 
-            />
-            <div v-else class="flex-grow text-white text-xl px-2 font-semibold">
+            <div class="flex-grow text-white text-xl px-2 font-semibold">
                 <NuxtLink to="/" class="hover:text-blue-200">Wetterkarte</NuxtLink>
             </div>
             <div class="md:hidden flex items-center justify-center rounded-full bg-white h-10 w-10"
@@ -75,14 +68,6 @@
             <div class="flex justify-between items-center py-3">
                 <div class="flex items-center">
                     <h1 class="text-xl font-bold">Wetterkarte</h1>
-                </div>
-                
-                <div v-if="isIndexPage" class=" w-11/12 md:w-1/3 hidden md:block">
-                    <SearchBar 
-                        mode="desktop" 
-                        @search="handleSearch" 
-                        @select-location="handleLocationSelect"
-                    />
                 </div>
                 
                 <div class="hidden md:flex items-center space-x-6">

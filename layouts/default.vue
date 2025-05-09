@@ -17,11 +17,15 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
+import { usePageMode } from '~/composables/usePageMode'
 
 // Get reference to current page component
 const route = useRoute()
 const page = computed(() => route.meta.pageComponent)
+
+// Use the composable instead of local state
+const { pageMode, setPageMode, currentPageMode } = usePageMode()
 
 // Forward navigation events to the index page component if on index route
 function handleSearch(query) {
@@ -35,4 +39,11 @@ function handleLocationSelect(location) {
     page.value.handleLocationSelect(location)
   }
 }
+
+// Function to handle map mouse movement (if you need it)
+function handleMapMouseMove() {
+  // Implementation here
+}
+
+// No need for defineExpose as the state is now shared through the composable
 </script>

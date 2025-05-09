@@ -14,7 +14,7 @@ export const useMapCoordinates = () => {
     if (!coordinates.value.lat || !coordinates.value.lng) {
       return 'Lat: -- | Lng: --'
     }
-    return `Lat: ${coordinates.value.lat} | Lng: ${coordinates.value.lng}`
+    return `Lat: ${coordinates.value.lat.toFixed(6)} | Lng: ${coordinates.value.lng.toFixed(6)}`
   }
 
   return {

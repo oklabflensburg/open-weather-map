@@ -3,7 +3,7 @@
     <div class="container-fluid mx-auto px-4">
       <div class="flex flex-col md:flex-row justify-between items-center">
         <!-- Coordinates display on the left - only show on index page -->
-        <div v-if="isIndexPage" class="text-xs text-gray-400 mb-2 md:mb-0">
+        <div v-if="currentPageMode() === 'map'" class="text-xs text-gray-400 mb-2 md:mb-0">
           {{ mapCoordinates.getFormattedCoordinates() }}
         </div>
         <div v-else class="flex-grow"></div>
@@ -22,14 +22,11 @@
 <script setup>
 // Import the map coordinates composable
 import { useMapCoordinates } from '~/composables/useMapCoordinates'
+import { usePageMode } from '~/composables/usePageMode'
+const { currentPageMode } = usePageMode()
 
 // Get current route to check if we're on the index page
 const route = useRoute()
-
-// Check if current page is index
-const isIndexPage = computed(() => {
-  return route.path === '/' || route.name === 'index'
-})
 
 // Access the shared coordinates state
 const mapCoordinates = useMapCoordinates()
