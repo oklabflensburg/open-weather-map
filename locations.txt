@@ -1,0 +1,9 @@
+# Orte für MOSMIX-Vorhersage
+# Format: ein Ort pro Zeile
+#   Stadtname           → wird über die cities-Datenbank aufgelöst
+#   lat,lon             → Koordinaten (Höhe = 0)
+#   lat,lon,elev        → Koordinaten mit Höhe in Metern
+# Leerzeilen und Zeilen mit # werden ignoriert.
+
+Flensburg
+54.75,9.5,33

@@ -1,9 +1,0 @@
-__pycache__/
-node_modules/
-venv/
-.idea/
-.env
-*.kml
-.DS_Store
-.nuxt
-.output
